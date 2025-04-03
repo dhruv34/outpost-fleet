@@ -1,5 +1,5 @@
 import pandas as pd
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel
 from typing import Optional
 import numpy as np
@@ -43,13 +43,13 @@ except Exception as e:
     print(f"Error loading data: {e}")
     df = None
 
-@app.get("/carrier/{dot_number}", response_model=CarrierResponse)
-async def get_carrier_by_dot(dot_number: int):
+@app.get("/carrier", response_model=CarrierResponse)
+async def get_carrier_by_dot(dot_number: int = Query(..., description="The DOT number to search for")):
     """
     Get carrier information by DOT number
     
     Args:
-        dot_number: The DOT number to search for
+        dot_number: The DOT number to search for (query parameter)
         
     Returns:
         Carrier information if found
@@ -86,7 +86,7 @@ async def get_carrier_by_dot(dot_number: int):
 
 @app.get("/")
 async def root():
-    return {"message": "Use /carrier/{dot_number} to search for carrier information."}
+    return {"message": "Use /carrier?dot_number=XXXX to search for carrier information."}
 
 # Health check endpoint
 @app.get("/health")
