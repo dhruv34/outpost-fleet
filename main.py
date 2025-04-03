@@ -33,6 +33,10 @@ def clean_phone_number(value):
 
 # Load the data once when the application starts
 try:
+    print(f"Starting application...")
+    print(f"Current working directory: {os.getcwd()}")
+    print(f"Files in directory: {os.listdir('.')}")
+    print(f"PORT environment variable: {os.getenv('PORT', 'Not set')}")
     df = pd.read_csv('data.csv')
     print("Data loaded successfully")
 except Exception as e:
@@ -77,6 +81,7 @@ async def get_carrier_by_dot(dot_number: int):
         return carrier_dict
         
     except Exception as e:
+        print(f"Error processing request: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/")
