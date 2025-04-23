@@ -37,10 +37,32 @@ try:
     print(f"Current working directory: {os.getcwd()}")
     print(f"Files in directory: {os.listdir('.')}")
     print(f"PORT environment variable: {os.getenv('PORT', 'Not set')}")
-    df = pd.read_csv('data.csv')
-    print("Data loaded successfully")
+    
+    # List of CSV files to load
+    csv_files = ['data1.csv', 'data2.csv', 'data3.csv']
+    dataframes = []
+    
+    # Load each CSV file
+    for file in csv_files:
+        try:
+            print(f"Loading {file}...")
+            df_temp = pd.read_csv(file)
+            dataframes.append(df_temp)
+            print(f"Successfully loaded {file}")
+        except Exception as e:
+            print(f"Error loading {file}: {e}")
+    
+    # Combine all dataframes
+    if dataframes:
+        df = pd.concat(dataframes, ignore_index=True)
+        print(f"Successfully combined {len(dataframes)} dataframes")
+        print(f"Total records: {len(df)}")
+    else:
+        print("No data loaded successfully")
+        df = None
+        
 except Exception as e:
-    print(f"Error loading data: {e}")
+    print(f"Error in data loading process: {e}")
     df = None
 
 @app.get("/carrier", response_model=CarrierResponse)
