@@ -17,8 +17,12 @@ try:
     print(f"Current working directory: {os.getcwd()}")
     print(f"Files in directory: {os.listdir('.')}")
     
-    # Load the CSV file
-    happy_robot_df = pd.read_csv("HAPPY_ROBOT_PROCESSED_726.csv")
+    # Load both CSV files
+    df1 = pd.read_csv("HAPPY_ROBOT_PROCESSED_1219.csv")
+    df2 = pd.read_csv("HAPPY_ROBOT_PROCESSED_1219_part2.csv")
+    
+    # Combine the DataFrames
+    happy_robot_df = pd.concat([df1, df2], ignore_index=True)
     print(f"Successfully loaded Happy_ROBOT data with {len(happy_robot_df)} total records")
 except Exception as e:
     print(f"Error loading Happy_ROBOT data: {e}")
