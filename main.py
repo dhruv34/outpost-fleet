@@ -7,7 +7,7 @@ import os
 
 app = FastAPI(
     title="Get container information",
-    description="API to query container information by container number or BOL and consignee",
+    description="API to query container information by container number or BOL",
     version="1.0.0",
 )
 
@@ -32,19 +32,15 @@ def clean_nan_values(value):
 
 @app.get("/search-container")
 async def search_container(
-    container_number: Optional[str] = Query(
-        None, description="Container number to search for"
-    ),
+    container_number: Optional[str] = Query(None, description="Container number to search for"),
     bol: Optional[str] = Query(None, description="Bill of Lading number to search for"),
-    consignee: str = Query(..., description="Consignee to search for"),
 ):
     """
-    Search for container information using either container number and consignee or BOL and consignee
+    Search for container information using either container number or BOL
 
     Args:
         container_number: Optional container number
         bol: Optional Bill of Lading number
-        consignee: Consignee name
 
     Returns:
         Complete container information if found, or error message if not found
@@ -53,23 +49,12 @@ async def search_container(
         if happy_robot_df is None:
             raise HTTPException(status_code=500, detail="Database not initialized")
 
-        # Convert consignee to uppercase for case-insensitive search
-        consignee = consignee.upper()
-
-        # Filter by consignee first
-        filtered_df = happy_robot_df[
-            happy_robot_df["CONSIGNEE"].str.upper() == consignee
-        ]
-
-        if filtered_df.empty:
-            return {"message": "could not find container"}
-
         # If container number is provided, search by container number
         if container_number:
-            result = filtered_df[filtered_df["CONTAINER_NUMBER"] == container_number]
+            result = happy_robot_df[happy_robot_df["CONTAINER_NUMBER"] == container_number]
         # If BOL is provided, search by BOL
         elif bol:
-            result = filtered_df[filtered_df["BOL"] == bol]
+            result = happy_robot_df[happy_robot_df["BOL"] == bol]
         else:
             return {"message": "Please provide either container_number or bol"}
 
@@ -90,7 +75,7 @@ async def search_container(
 @app.get("/")
 async def root():
     return {
-        "message": "Use /search-container?container_number=XXXX&consignee=YYYY or /search-container?bol=XXXX&consignee=YYYY to search for container information."
+        "message": "Use /search-container?container_number=XXXX or /search-container?bol=XXXX to search for container information."
     }
 
 
