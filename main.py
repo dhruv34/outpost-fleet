@@ -14,19 +14,21 @@ app = FastAPI(
 # Load Happy_ROBOT data
 try:
     print("Loading Happy_ROBOT data...")
-    # Load both CSV files
-    df1 = pd.read_csv("HAPPY_ROBOT_PROCESSED_726.csv")
-    df2 = pd.read_csv("HAPPY_ROBOT_PROCESSED_726_part2.csv")
-
-    # Combine both dataframes
-    happy_robot_df = pd.concat([df1, df2], ignore_index=True)
-    print(
-        f"Successfully loaded Happy_ROBOT data with {len(happy_robot_df)} total records"
-    )
+    print(f"Current working directory: {os.getcwd()}")
+    print(f"Files in directory: {os.listdir('.')}")
+    
+    # Load the CSV file
+    happy_robot_df = pd.read_csv("HAPPY_ROBOT_PROCESSED_726.csv")
+    print(f"Successfully loaded Happy_ROBOT data with {len(happy_robot_df)} total records")
 except Exception as e:
     print(f"Error loading Happy_ROBOT data: {e}")
     happy_robot_df = None
 
+def clean_nan_values(value):
+    """Convert NaN values to None for JSON compatibility"""
+    if pd.isna(value):
+        return None
+    return value
 
 @app.get("/search-container")
 async def search_container(
@@ -74,8 +76,11 @@ async def search_container(
         if result.empty:
             return {"message": "could not find container"}
 
-        # Return the entire row as a dictionary
-        return result.iloc[0].to_dict()
+        # Convert the result to a dictionary and clean NaN values
+        result_dict = result.iloc[0].to_dict()
+        cleaned_dict = {k: clean_nan_values(v) for k, v in result_dict.items()}
+        
+        return cleaned_dict
 
     except Exception as e:
         print(f"Error processing request: {e}")
